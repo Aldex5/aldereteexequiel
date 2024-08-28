@@ -1,0 +1,136 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #111; /* Fondo oscuro */
+  color: #f2f2f2; /* Texto claro para buen contraste */
+  margin: 0;
+  padding: 0;
+}
+
+/* Estilos del header */
+header {
+  text-align: center;
+  padding: 20px;
+  background-color: #222; /* Fondo ligeramente más claro para el header */
+  border-bottom: 2px solid red; /* Línea roja característica de la F1 */
+}
+
+
+header h1 {
+  color: red; /* Rojo intenso para el título */
+  font-size: 2.5em;
+  margin-top: 10px;
+}
+
+/* Estilo de la barra de navegación */
+.navbar {
+  display: flex;
+  justify-content: center;
+  background-color: #333;
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 5px;
+}
+
+.navbar a {
+  color: #f2f2f2;
+  padding: 14px 20px;
+  text-decoration: none;
+  text-align: center;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.navbar a:hover {
+  background-color: red; /* Efecto hover rojo */
+  color: #fff;
+}
+
+.navbar a.active {
+  background-color: #444; /* Activo: gris oscuro */
+}
+
+/* Estilo del formulario de búsqueda */
+form {
+  text-align: right;
+  margin: 20px 0;
+}
+
+form input[type="text"] {
+  padding: 10px;
+  width: 200px;
+  border: 2px solid red;
+  border-radius: 5px;
+  background-color: #333;
+  color: #f2f2f2;
+}
+
+form button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: red;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button:hover {
+  background-color: red;
+}
+
+/* Estilo de las secciones */
+main {
+  padding: 20px;
+}
+
+section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #222; /* Fondo gris oscuro */
+  border-radius: 5px;
+  border-left: 5px solid red /* Línea roja a la izquierda */
+}
+
+section h2 {
+  color: red;
+  font-size: 2em;
+  margin-bottom: 15px;
+}
+
+section p {
+  font-size: 1.2em;
+  line-height: 1.6;
+}
+
+/* Estilo del footer */
+footer {
+  background-color: #222;
+  padding: 20px;
+  text-align: center;
+  border-top: 2px solid red;
+}
+
+footer a {
+  color: red;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+table {
+  width: 35%; /* Ajusta el ancho de la tabla */
+  font-family: Arial, sans-serif;
+  background-color: #111; /* Fondo oscuro para la tabla */
+}
+
+th, td {
+  padding: 15px; /* Aumenta el espacio dentro de las celdas */
+  text-align: center;
+  border: 1px solid #444; /* Bordes oscuros para las celdas */
+  color: #f2f2f2; /* Color del texto */
+}
