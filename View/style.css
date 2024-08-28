@@ -49,14 +49,9 @@ header h1 {
   color: #fff;
 }
 
-.navbar a.active {
-  /* el activo va a tener un gris mas oscuro */
-  background-color: #444; 
-}
-
 /*Busqueda */
 form {
-  text-align: right;
+  text-align: center;
   margin: 20px 0;
 }
 
