@@ -7,14 +7,14 @@ body {
   padding: 0;
 }
 
-/* Estilos del header */
+
 header {
   text-align: center;
   padding: 20px;
   /* color mas clarito para el header */
   background-color: #222; 
-   /* Línea roja característica de la F1 */
-  border-bottom: 2px solid red; 
+   border-bottom: 2px solid red; 
+  
 }
 
 
