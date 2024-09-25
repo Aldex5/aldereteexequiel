@@ -1,58 +1,124 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../style.css">
     <title>Pilotos</title>
 </head>
+
 <body>
     <header>
-        <a href="index.html"><img src="Imagenes/F1.jpeg" alt="Logo de la F1" width="200" height="150"></a>    <br><br>
+        <a href="../index.html"><img src="../Imagenes/F1.jpeg" alt="Logo de la F1" width="200" height="150"></a>
+        <br><br>
         <h1>Aca estaran los pilotos</h1>
         <div class="navbar">
-            <a class="active" href="index.html">Inicio</a>
-            <a href="Pilotos.html">Pilotos</a>
-            <a href="Pistas.html">Pistas</a>
-            <a href="Posiciones.html">Posiciones</a>
+            <a class="active" href="../index.html">Inicio</a>
+            <a href="../views/Pilotos.html">Pilotos</a>
+            <a href="../views/Pistas.html">Pistas</a>
+            <a href="../views/Posiciones.html">Posiciones</a>
         </div>
         <br>
     </header>
     <main>
-        <form action="registrardatos.php" method="post">
-        
-        Seleccione el equipo de F1 que desea Observar:
-        <!--Faltan escuderias que agregar, pero a modo prueba puse los 5 mas destacados-->
-        <select name="equipo">
-            <option value="mercedes">Mercedes</option>
-            <option value="redbull">Red Bull</option>
-            <option value="ferrari">Ferrari</option>
-            <option value="mclaren">McLaren</option>
-            <option value="alpine">Alpine</option>
-            <option value="Williams">Williams</option>
-        </select>
-            <br><br>
-            <!--Lo Mismo que con los equipos, puse los pilotos mas destacados -->
-            Seleccione el piloto de F1 que desea ver:
-            <select name="piloto">
-            <option value="lewis_hamilton">Lewis Hamilton (Mercedes)</option>
-            <option value="george_russell">George Russell (Mercedes)</option>
-            <option value="max_verstappen">Max Verstappen (Red Bull)</option>
-            <option value="sergio_perez">Sergio Pérez (Red Bull)</option>
-            <option value="charles_leclerc">Charles Leclerc (Ferrari)</option>
-            <option value="carlos_sainz">Carlos Sainz (Ferrari)</option>
-            <option value="lando_norris">Lando Norris (McLaren)</option>
-            <option value="oscar_piastri">Oscar Piastri (McLaren)</option>
-            <option value="esteban_ocon">Esteban Ocon (Alpine)</option>
-            <option value="pierre_gasly">Pierre Gasly (Alpine)</option>
-            <option value="albon_alex">Alex Albon (Williams)</option>
-            <option value="colapinto_franco">FRANCO COLAPINTO (Williams)</option>
-        </select>
-        <br><br>
-        <input type="submit" value="Enviar">
-        </form>
+
+    </main>
+    <br><br>
+    Seleccione el piloto de F1 que desea ver:
+    <select name="piloto" id="piloto">
+        <option value="lewis_hamilton">Lewis Hamilton (Mercedes)</option>
+        <option value="george_russell">George Russell (Mercedes)</option>
+        <option value="max_verstappen">Max Verstappen (Red Bull)</option>
+        <option value="sergio_perez">Sergio Pérez (Red Bull)</option>
+        <option value="charles_leclerc">Charles Leclerc (Ferrari)</option>
+        <option value="carlos_sainz">Carlos Sainz (Ferrari)</option>
+        <option value="lando_norris">Lando Norris (McLaren)</option>
+        <option value="oscar_piastri">Oscar Piastri (McLaren)</option>
+        <option value="esteban_ocon">Esteban Ocon (Alpine)</option>
+        <option value="pierre_gasly">Pierre Gasly (Alpine)</option>
+        <option value="alex_albon">Alex Albon (Williams)</option>
+        <option value="franco_colapinto">Franco Colapinto (Williams)</option>
+    </select>
+    <br><br>
+    <input type="button" value="Mostrar Piloto" onclick="mostrarPiloto()">
+    </form>
+    </main>
+
+    <div id="infoPiloto">
+        <p>Descripción del piloto:</p>
+        <p id="descripcionPiloto"></p>
+        <div id="pilotoImagen">
+            <img src="../Imagenes/todos.jpeg" alt="Foto de los piloto" id="imgPilotos">
+        </div>
+    </div>
     </main>
     <br><br>
     <footer>
-        <p>Todos los derechos estan reservados para Alderete Exequiel 2024</p>
+        <p>Todos los derechos están reservados para Alderete Exequiel 2024</p>
     </footer>
+
+    <script>
+        // Objeto con información de los pilotos
+        const dataPilotos = {
+            lewis_hamilton: {
+                descripcion: "Lewis Hamilton es siete veces campeón del mundo y uno de los mejores pilotos de la historia.",
+                imagen: "../Imagenes/hamilton.jpeg"
+            },
+            george_russell: {
+                descripcion: "George Russell es un joven talento de Mercedes con gran futuro en la F1.",
+                imagen: "../Imagenes/russell.jpeg"
+            },
+            max_verstappen: {
+                descripcion: "Max Verstappen es el actual campeón de la Fórmula 1 y uno de los pilotos más agresivos.",
+                imagen: "../Imagenes/verstappen.jpeg"
+            },
+            sergio_perez: {
+                descripcion: "Sergio 'Checo' Pérez es el piloto mexicano de Red Bull con múltiples victorias en su haber.",
+                imagen: "../Imagenes/perez.jpeg"
+            },
+            charles_leclerc: {
+                descripcion: "Charles Leclerc es el piloto monegasco estrella de Ferrari, conocido por su velocidad y destreza.",
+                imagen: "../Imagenes/leclerc.jpeg"
+            },
+            carlos_sainz: {
+                descripcion: "Carlos Sainz es un piloto español de Ferrari, hijo del famoso piloto de rally Carlos Sainz Sr.",
+                imagen: "../Imagenes/sainz.jpeg"
+            },
+            lando_norris: {
+                descripcion: "Lando Norris es el joven piloto británico de McLaren, conocido por su talento y carisma.",
+                imagen: "../Imagenes/norris.jpeg"
+            },
+            oscar_piastri: {
+                descripcion: "Oscar Piastri es un prometedor piloto australiano de McLaren.",
+                imagen: "../Imagenes/piastri.jpeg"
+            },
+            esteban_ocon: {
+                descripcion: "Esteban Ocon es el piloto francés de Alpine, ganador del Gran Premio de Hungría 2021.",
+                imagen: "../Imagenes/ocon.jpeg"
+            },
+            pierre_gasly: {
+                descripcion: "Pierre Gasly, piloto francés de Alpine, es conocido por su victoria en Monza 2020.",
+                imagen: "../Imagenes/gasly.jpeg"
+            },
+            alex_albon: {
+                descripcion: "Alex Albon es el piloto tailandés-británico de Williams, con experiencia en Red Bull.",
+                imagen: "../Imagenes/albon.jpeg"
+            },
+            franco_colapinto: {
+                descripcion: "Franco Colapinto es un piloto argentino que compite en la academia de Williams. Pero finalizara la temporada corriendo para el equipo principal",
+                imagen: "../Imagenes/colapinto.jpeg"
+            }
+        };
+
+
+        function mostrarPiloto() {
+            const piloto = document.getElementById("piloto").value;
+            const descripcion = dataPilotos[piloto].descripcion;
+            const imagen = dataPilotos[piloto].imagen;
+
+            document.getElementById("descripcionPiloto").innerText = descripcion;
+            document.getElementById("imgPilotos").src = imagen;
+        }
+    </script>
 </body>
+
 </html>
