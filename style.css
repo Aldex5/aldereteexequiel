@@ -136,6 +136,64 @@ th, td {
 
  /* Desde aca cosas añadidas para el Tp2 */
 
+
+/* Ajustes para celular */
+@media (max-width: 600px) {
+  header h1 {
+    font-size: 1.8em;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar a {
+    padding: 10px 15px;
+    width: 100%;
+    margin: 5px 0;
+  }
+
+  form input[type="text"] {
+    width: 100%;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  section h2 {
+    font-size: 1.5em;
+  }
+
+  section p {
+    font-size: 1em;
+  }
+}
+
+/* Ajustes para tablets */
+@media (max-width: 768px) {
+  header h1 {
+    font-size: 2em;
+  }
+
+  form input[type="text"] {
+    width: 100%;
+  }
+
+  .navbar {
+    gap: 10px;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  section h2 {
+    font-size: 1.8em;
+  }
+}
+
  body {
   font-family: Arial, sans-serif;
 }
