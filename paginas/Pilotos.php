@@ -84,8 +84,8 @@
         <div class="navbar">
             <a class="active" href="../index.php">Inicio</a>
             <a href="../paginas/Pilotos.php">Pilotos</a>
-            <a href="../paginas/Pistas.html">Pistas</a>
-            <a href="../paginas/Posiciones.html">Posiciones</a>
+            <a href="../paginas/Pistas.php">Pistas</a>
+            <a href="../paginas/Posiciones.php">Posiciones</a>
         </div>
         <br>
     </header>
