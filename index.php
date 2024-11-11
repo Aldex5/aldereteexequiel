@@ -7,14 +7,14 @@
     <title>Compra de Entradas F1</title>
 </head>
 <body>
-    <?php include 'conexion.php'; ?>
+    <?php include 'php/conexion.php'; ?>
 
     <header>
         <img src="Imagenes/F1.jpeg" alt="Logo de la F1" width="200" height="150"><br><br>
         <h1>Mi página de Fórmula 1</h1>
         <div class="navbar">
             <a class="active" href="index.php">Inicio</a>
-            <a href="paginas/Pilotos.html">Pilotos</a>
+            <a href="paginas/Pilotos.php">Pilotos</a>
             <a href="paginas/Pistas.html">Pistas</a>
             <a href="paginas/Posiciones.html">Posiciones</a>
         </div>
