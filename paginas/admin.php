@@ -1,23 +1,23 @@
 <?php
 session_start();
 if (!isset($_SESSION['admin_id'])) {
-    header("Location: login.php");  // Redirigir si no está logueado
+    header("Location: login.php");  
     exit;
 }
 
-include '../php/conexion.php';  // Conexión a la base de datos
+include '../php/conexion.php';  
 
-// Insertar piloto
+// Inserto piloto
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_piloto'])) {
     $nombre = $_POST['nombre'];
     $equipo = $_POST['equipo'];
-    $imagen = $_FILES['imagen']['name'];  // Nombre de la imagen
-    $imagen_tmp = $_FILES['imagen']['tmp_name'];  // Ruta temporal de la imagen
-    $imagen_path = "../Imagenes/" . $imagen;  // Ruta de destino para la imagen
+    $imagen = $_FILES['imagen']['name'];  
+    $imagen_tmp = $_FILES['imagen']['tmp_name']; 
+    $imagen_path = "../Imagenes/" . $imagen; 
 
     // Subir imagen
     if (move_uploaded_file($imagen_tmp, $imagen_path)) {
-        // Insertar piloto en la base de datos
+        // Inserto piloto en la base de datos
         $stmt = $conn->prepare("INSERT INTO pilotos (nombre, equipo, imagen) VALUES (:nombre, :equipo, :imagen)");
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':equipo', $equipo);
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_piloto'])) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_pista'])) {
     $nombre_pista = $_POST['nombre_pista'];
 
-    // Insertar pista en la base de datos
+    // Inserto pista en la base de datos
     $stmt = $conn->prepare("INSERT INTO pistas (nombre) VALUES (:nombre_pista)");
     $stmt->bindParam(':nombre_pista', $nombre_pista);
 
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_pista'])) {
     }
 }
 
-// Obtener pilotos y pistas
+// Obtengo pilotos y pistas
 $pilotos = $conn->query("SELECT * FROM pilotos")->fetchAll();
 $pistas = $conn->query("SELECT * FROM pistas")->fetchAll();
 ?>
@@ -79,7 +79,7 @@ $pistas = $conn->query("SELECT * FROM pistas")->fetchAll();
         <button type="submit" name="add_pista">Agregar Pista</button>
     </form>
 
-    <!-- Listado de Pilotos -->
+    
     <h2>Listado de Pilotos</h2>
     <ul>
         <?php foreach ($pilotos as $piloto): ?>
@@ -87,7 +87,7 @@ $pistas = $conn->query("SELECT * FROM pistas")->fetchAll();
         <?php endforeach; ?>
     </ul>
 
-    <!-- Listado de Pistas -->
+    
     <h2>Listado de Pistas</h2>
     <ul>
         <?php foreach ($pistas as $pista): ?>

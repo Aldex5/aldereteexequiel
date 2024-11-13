@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Inicio de sesión exitoso, guardamos la sesión
         $_SESSION['admin_id'] = $admin['id'];
         $_SESSION['username'] = $admin['username'];
-        header("Location: admin.php");  // Redirigimos al panel de administración
+        header("Location: admin.php");  
         exit;
     } else {
         $error = "Usuario o contraseña incorrectos.";

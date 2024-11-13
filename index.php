@@ -1,12 +1,9 @@
 <?php
-  // Inicializar la variable mensaje
 session_start();
 $mensaje = "¡Ud se ha Deslogueado Correctamente!";
-
-// Incluir archivo de conexión
 include 'php/conexion.php';
 
-// Manejo del inicio de sesión del administrador
+// inicio de sesión del administrador
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["accion"] == "login") {
     if (isset($_POST['username']) && isset($_POST['contraseña'])) {
         $usuario = $_POST['username'];
@@ -32,30 +29,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["a
         }
     }
 }
-// Verificar si el administrador está logueado
+// Verifico si el administrador está logueado
 $admin_logueado = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
 
 // Cerrar sesión si se requiere
 if (isset($_GET['logout'])) {
     session_destroy();
     $mensaje = "Te has deslogueado correctamente.";  // Mensaje de cierre de sesión
-    header("Location: index.php?mensaje=" . urlencode($mensaje));  // Pasar el mensaje a la URL
+    header("Location: index.php?mensaje=" . urlencode($mensaje));  
     exit;
 }
 
 
-// Manejo de CRUD de entradas (solo si el administrador está logueado)
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['accion']) && $_POST['accion'] == 'crear') {
         $cantidad = $_POST['cantidad'];
         $email = $_POST['email'];
 
-        // Consultar las entradas disponibles
+        
         $stmt = $conn->prepare("SELECT total_disponibles FROM disponibilidad WHERE id = 1");
         $stmt->execute();
         $disponibles = $stmt->fetch(PDO::FETCH_ASSOC)['total_disponibles'];
 
-        // Verificar si hay suficientes entradas disponibles
+        
         if ($cantidad <= $disponibles) {
             // Insertar la entrada en la base de datos
             $stmt = $conn->prepare("INSERT INTO entradas (cantidad, email) VALUES (:cantidad, :email)");
@@ -76,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     }
 
-    // CRUD: Actualizar entradas
+    // Actualizar entradas
     if (isset($_POST['accion']) && $_POST['accion'] == 'actualizar') {
         $id = $_POST['id'];
         $cantidad = $_POST['cantidad'];
@@ -89,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $mensaje = "Entrada actualizada correctamente.";
     }
 
-    // CRUD: Eliminar entradas
+    // Eliminar entradas
     if (isset($_POST['accion']) && $_POST['accion'] == 'eliminar') {
         $id = $_POST['id'];
 

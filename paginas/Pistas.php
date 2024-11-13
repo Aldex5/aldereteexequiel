@@ -8,13 +8,12 @@
 </head>
 <body>
     <?php
-        // Incluir archivo de conexión
         include '../php/conexion.php';
 
         // Consulta para obtener la disponibilidad de entradas desde la base de datos
         $stmt = $conn->prepare("SELECT * FROM disponibilidad WHERE id = 1");
         $stmt->execute();
-        $data = $stmt->fetch(PDO::FETCH_ASSOC); // Obtener datos como array asociativo
+        $data = $stmt->fetch(PDO::FETCH_ASSOC); 
     ?>
     <header>
         <a href="../index.php"><img src="../Imagenes/F1.jpeg" width="200" height="150"></a>
@@ -40,7 +39,7 @@
                 <option value="monaco">Gran Premio de Mónaco (Circuito de Mónaco)</option>
             </select>
             <br><br> 
-            <!-- Muestran las entradas disponibles de la base de datos-->
+           
             <p>Entradas disponibles: <?php echo $data['total_disponibles']; ?></p> 
             <input type="button" value="Mostrar Descripción" onclick="mostrarDescripcion()">
         </form>

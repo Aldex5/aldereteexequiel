@@ -1,7 +1,7 @@
 <?php
     include '../php/conexion.php';
 
-    // Consulta para obtener las posiciones de los pilotos, equipos y puntos
+    
     $stmt = $conn->prepare("SELECT p.nombre AS piloto, e.nombre AS equipo, pos.puntos
                             FROM posiciones pos
                             JOIN pilotos p ON pos.id_piloto = p.id

@@ -12,7 +12,7 @@
     <?php
     include '../php/conexion.php'; 
 
-    // Obtener todos los pilotos de la base de datos
+    // Obtengo todos los pilotos de la base de datos
     $stmt = $conn->prepare("SELECT * FROM pilotos");
     $stmt->execute();
     $pilotos = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -58,18 +58,16 @@
     </footer>
 
     <script>
-        // Datos de pilotos en JavaScript
+       
         const dataPilotos = <?php echo json_encode($pilotos); ?>;
 
         function mostrarPiloto() {
-            // Obtiene el ID del piloto seleccionado
+           
             const pilotoId = document.getElementById("piloto").value;
-            // Encuentra el piloto correspondiente en el arreglo de datos
             const piloto = dataPilotos.find(p => p.id == pilotoId);
 
-            // Si el piloto existe, muestra su descripción e imagen; si no, muestra mensaje e imagen predeterminada
             const descripcion = piloto ? piloto.descripcion : 'No se encontró descripción';
-            const imagen = piloto ? piloto.imagen : '../Imagenes/todos.jpeg'; // Imagen predeterminada si no se encuentra
+            const imagen = piloto ? piloto.imagen : '../Imagenes/todos.jpeg'; 
 
             document.getElementById("descripcionPiloto").innerText = descripcion;
             document.getElementById("imgPilotos").src = imagen;

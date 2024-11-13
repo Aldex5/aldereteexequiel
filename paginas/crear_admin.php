@@ -1,11 +1,9 @@
 <?php
-include '../php/conexion.php'; // Asegúrate de que este archivo contiene la conexión correcta a la base de datos
+include '../php/conexion.php'; 
 
-// Definir el nombre de usuario y la contraseña
-$username = 'admin';  // El nombre de usuario para el admin
-$password = '123456';  // La contraseña en texto plano para el admin
+$username = 'admin';  
+$password = '123456';  
 
-// Cifrar la contraseña usando password_hash
 $password_hashed = password_hash($password, PASSWORD_DEFAULT);
 
 // Preparar y ejecutar la consulta SQL para insertar el administrador
