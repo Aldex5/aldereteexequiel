@@ -1,122 +1,115 @@
 <?php
+  // Inicializar la variable mensaje
+session_start();
+$mensaje = "¡Ud se ha Deslogueado Correctamente!";
+
 // Incluir archivo de conexión
 include 'php/conexion.php';
 
-$mensaje = ""; // Variable para almacenar el mensaje de éxito
+// Manejo del inicio de sesión del administrador
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["accion"] == "login") {
+    if (isset($_POST['username']) && isset($_POST['contraseña'])) {
+        $usuario = $_POST['username'];
+        $contraseña = $_POST['contraseña'];
 
-// Manejo de la acción de compra
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["accion"] == "crear") {
-    $cantidad = $_POST['cantidad'];
-    $email = $_POST['email'];
+        // Consultar el administrador en la base de datos
+        $stmt = $conn->prepare("SELECT * FROM administradores WHERE username = :username");
+        $stmt->bindParam(':username', $usuario);
+        $stmt->execute();
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Consultar la disponibilidad actual
-    $stmt = $conn->prepare("SELECT total_disponibles FROM disponibilidad WHERE id = 1");
-    $stmt->execute();
-    $disponibilidad = $stmt->fetch(PDO::FETCH_ASSOC);
-    $entradasDisponibles = $disponibilidad['total_disponibles'];
+        if ($admin) {
+            if (password_verify($contraseña, $admin['password'])) {
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_id'] = $admin['id'];
+                $_SESSION['admin_username'] = $admin['username'];
+                $mensaje = "¡Se ha logueado correctamente " . $usuario . "!";
+            } else {
+                $mensaje = "Usuario o contraseña incorrectos.";
+            }
+        } else {
+            $mensaje = "Usuario no encontrado.";
+        }
+    }
+}
+// Verificar si el administrador está logueado
+$admin_logueado = isset($_SESSION['admin_logged_in']) && $_SESSION['admin_logged_in'] === true;
 
-    if ($cantidad <= $entradasDisponibles) {
-        try {
-            // Iniciar una transacción
-            $conn->beginTransaction();
+// Cerrar sesión si se requiere
+if (isset($_GET['logout'])) {
+    session_destroy();
+    $mensaje = "Te has deslogueado correctamente.";  // Mensaje de cierre de sesión
+    header("Location: index.php?mensaje=" . urlencode($mensaje));  // Pasar el mensaje a la URL
+    exit;
+}
 
-            // Restar entradas disponibles
+
+// Manejo de CRUD de entradas (solo si el administrador está logueado)
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['accion']) && $_POST['accion'] == 'crear') {
+        $cantidad = $_POST['cantidad'];
+        $email = $_POST['email'];
+
+        // Consultar las entradas disponibles
+        $stmt = $conn->prepare("SELECT total_disponibles FROM disponibilidad WHERE id = 1");
+        $stmt->execute();
+        $disponibles = $stmt->fetch(PDO::FETCH_ASSOC)['total_disponibles'];
+
+        // Verificar si hay suficientes entradas disponibles
+        if ($cantidad <= $disponibles) {
+            // Insertar la entrada en la base de datos
+            $stmt = $conn->prepare("INSERT INTO entradas (cantidad, email) VALUES (:cantidad, :email)");
+            $stmt->bindParam(':cantidad', $cantidad);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+
+            // Actualizar la disponibilidad de entradas
             $stmt = $conn->prepare("UPDATE disponibilidad SET total_disponibles = total_disponibles - :cantidad WHERE id = 1");
             $stmt->bindParam(':cantidad', $cantidad);
             $stmt->execute();
 
-            // Insertar compra en la tabla `entradas`
-            $stmt = $conn->prepare("INSERT INTO entradas (cantidad) VALUES (:cantidad)");
-            $stmt->bindParam(':cantidad', $cantidad);
-            $stmt->execute();
-
-            // Obtener el ID de la entrada recién insertada
-            $entrada_id = $conn->lastInsertId();
-
-            // Insertar el correo en la tabla `correos`
-            $stmtCorreo = $conn->prepare("INSERT INTO correos (entrada_id, email) VALUES (:entrada_id, :email)");
-            $stmtCorreo->bindParam(':entrada_id', $entrada_id);
-            $stmtCorreo->bindParam(':email', $email);
-            $stmtCorreo->execute();
-
-            // Confirmar la transacción
-            $conn->commit();
-            $mensaje = "Compra registrada, para realizar el pago diríjase a su casilla de correo con los pasos a seguir.";
-        } catch (Exception $e) {
-            // En caso de error, revertir la transacción
-            $conn->rollBack();
-            echo "<p>Error: " . $e->getMessage() . "</p>";
-        }
-    } else {
-        echo "<p>Lo sentimos, no hay suficientes entradas disponibles.</p>";
-    }
-}
-
-// Actualizar entrada
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["accion"] == "actualizar") {
-    $id = $_POST['id'];
-    $cantidadNueva = $_POST['cantidad'];
-
-    // Obtener la cantidad anterior
-    $stmt = $conn->prepare("SELECT cantidad FROM entradas WHERE id = :id");
-    $stmt->bindParam(':id', $id);
-    $stmt->execute();
-    $cantidadAnterior = $stmt->fetch(PDO::FETCH_ASSOC)['cantidad'];
-
-    // Calcular la diferencia y ajustar disponibilidad
-    $diferencia = $cantidadNueva - $cantidadAnterior;
-
-    // Consultar disponibilidad actual
-    $stmt = $conn->prepare("SELECT total_disponibles FROM disponibilidad WHERE id = 1");
-    $stmt->execute();
-    $entradasDisponibles = $stmt->fetch(PDO::FETCH_ASSOC)['total_disponibles'];
-
-    if ($entradasDisponibles - $diferencia >= 0) {
-        // Actualizar cantidad en la tabla entradas
-        $stmt = $conn->prepare("UPDATE entradas SET cantidad = :cantidadNueva WHERE id = :id");
-        $stmt->bindParam(':cantidadNueva', $cantidadNueva);
-        $stmt->bindParam(':id', $id);
-
-        if ($stmt->execute()) {
-            // Ajustar la disponibilidad en base a la diferencia
-            $stmt = $conn->prepare("UPDATE disponibilidad SET total_disponibles = total_disponibles - :diferencia WHERE id = 1");
-            $stmt->bindParam(':diferencia', $diferencia);
-            $stmt->execute();
-            header("Location: ".$_SERVER['PHP_SELF']);
-            exit;
+            // Generar mensaje de confirmación
+            $mensaje = "Compra realizada con éxito. Diríjase a su casilla de correo para realizar el pago.";
         } else {
-            echo "<p>Error al actualizar la entrada.</p>";
+            // Si no hay suficientes entradas disponibles
+            $mensaje = "No hay suficientes entradas disponibles. Quedan " . $disponibles . " entradas.";
         }
-    } else {
-        echo "<p>No hay suficientes entradas disponibles para actualizar a esa cantidad.</p>";
     }
-}
 
-// Eliminar entrada
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["accion"] == "eliminar") {
-    $id = $_POST['id'];
+    // CRUD: Actualizar entradas
+    if (isset($_POST['accion']) && $_POST['accion'] == 'actualizar') {
+        $id = $_POST['id'];
+        $cantidad = $_POST['cantidad'];
 
-    // Recuperar la cantidad antes de eliminar la entrada
-    $stmt = $conn->prepare("SELECT cantidad FROM entradas WHERE id = :id");
-    $stmt->bindParam(':id', $id);
-    $stmt->execute();
-    $cantidadEliminada = $stmt->fetch(PDO::FETCH_ASSOC)['cantidad'];
-
-    // Eliminar entrada
-    $stmt = $conn->prepare("DELETE FROM entradas WHERE id = :id");
-    $stmt->bindParam(':id', $id);
-
-    if ($stmt->execute()) {
-        // Devolver entradas a la disponibilidad
-        $stmt = $conn->prepare("UPDATE disponibilidad SET total_disponibles = total_disponibles + :cantidad WHERE id = 1");
-        $stmt->bindParam(':cantidad', $cantidadEliminada);
+        $stmt = $conn->prepare("UPDATE entradas SET cantidad = :cantidad WHERE id = :id");
+        $stmt->bindParam(':cantidad', $cantidad);
+        $stmt->bindParam(':id', $id);
         $stmt->execute();
-        header("Location: ".$_SERVER['PHP_SELF']);
-        exit;
-    } else {
-        echo "<p>Error al eliminar la entrada.</p>";
+
+        $mensaje = "Entrada actualizada correctamente.";
+    }
+
+    // CRUD: Eliminar entradas
+    if (isset($_POST['accion']) && $_POST['accion'] == 'eliminar') {
+        $id = $_POST['id'];
+
+        $stmt = $conn->prepare("DELETE FROM entradas WHERE id = :id");
+        $stmt->bindParam(':id', $id);
+        $stmt->execute();
+
+        $mensaje = "Entrada eliminada correctamente.";
     }
 }
+
+// Obtener listado de compras para mostrar en el CRUD
+$stmt = $conn->prepare("SELECT * FROM entradas");
+$stmt->execute();
+$entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Obtener las entradas disponibles
+$stmt = $conn->prepare("SELECT total_disponibles FROM disponibilidad WHERE id = 1");
+$stmt->execute();
+$disponibles = $stmt->fetch(PDO::FETCH_ASSOC)['total_disponibles'];
 ?>
 
 <!DOCTYPE html>
@@ -126,8 +119,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["a
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>Compra de Entradas F1</title>
+    <script>
+        // Función para mostrar un mensaje emergente
+        function mostrarMensaje() {
+            var mensaje = "<?php echo $mensaje; ?>";
+            if (mensaje) {
+                alert(mensaje); // Mostrar el mensaje como alerta emergente
+            }
+        }
+    </script>
 </head>
-<body>
+<body onload="mostrarMensaje()">
     <header>
         <img src="Imagenes/F1.jpeg" alt="Logo de la F1" width="200" height="150"><br><br>
         <h1>Mi página de Fórmula 1</h1>
@@ -136,68 +138,107 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["accion"]) && $_POST["a
             <a href="paginas/Pilotos.php">Pilotos</a>
             <a href="paginas/Pistas.php">Pistas</a>
             <a href="paginas/Posiciones.php">Posiciones</a>
+            <?php if ($admin_logueado): ?>
+                <a href="index.php?logout=true">Cerrar sesión</a>
+            <?php else: ?>
+                <a href="javascript:void(0);" onclick="document.getElementById('loginModal').style.display='block'">Iniciar sesión</a>
+            <?php endif; ?>
         </div>
-        <br>
     </header>
+    
     <hr>
 
-    <!-- Formulario de compra de entradas -->
-    <section id="compra-entradas">
-        <h2>Compra tus entradas</h2>
+    <!-- Modal de inicio de sesión -->
+    <div id="loginModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('loginModal').style.display='none'">&times;</span>
+            <h2>Iniciar sesión como Administrador</h2>
+            <form method="POST" action="index.php">
+                <label for="usuario">Usuario:</label>
+                <input type="text" id="usuario" name="username" required>
+                <label for="contraseña">Contraseña:</label>
+                <input type="password" id="contraseña" name="contraseña" required>
+                <button type="submit" name="accion" value="login">Iniciar sesión</button>
+            </form>
+            <?php if ($mensaje): ?>
+                <p style="color:red;"><?php echo $mensaje; ?></p>
+            <?php endif; ?>
+        </div>
+    </div>
 
-        <?php
-            // Consultar entradas disponibles
-            $stmt = $conn->prepare("SELECT total_disponibles FROM disponibilidad WHERE id = 1");
-            $stmt->execute();
-            $disponibilidad = $stmt->fetch(PDO::FETCH_ASSOC);
-            $entradasDisponibles = $disponibilidad['total_disponibles'];
-        ?>
+    <hr>
 
-        <p>Disponibilidad actual: <span id="entradas-disponibles"><?php echo $entradasDisponibles; ?></span> entradas</p>
-        <form id="form-compra" method="POST">
-            <label for="cantidad">Cantidad de entradas:</label>
-            <input type="number" id="cantidad" name="cantidad" min="1" max="10" required>
+    <?php if ($admin_logueado): ?>
+        <h2>Panel de Administración</h2>
+        <p>Desde aca se puede realizar el mantenimiento necesario para la página (agregar pistas,pilotos etc)</p>
+        <br>
+        <!-- Formulario para agregar piloto -->
+        <h3>Agregar Piloto</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="text" name="piloto_nombre" placeholder="Nombre del Piloto" required>
+            <input type="file" name="piloto_imagen" required>
+            <button type="submit" name="accion" value="agregar_piloto">Agregar Piloto</button>
+        </form>
 
+        <!-- Formulario para agregar pista -->
+        <h3>Agregar Pista</h3>
+        <form method="POST">
+            <input type="text" name="pista_nombre" placeholder="Nombre de la Pista" required>
+            <button type="submit" name="accion" value="agregar_pista">Agregar Pista</button>
+        </form>
+
+        
+    <?php else: ?>
+        <h2>Compra de Entradas</h2>
+        <p>Entradas disponibles: <?php echo $disponibles; ?></p>
+
+        <!-- Formulario para comprar entradas -->
+        <form method="POST">
+            <label for="cantidad">Cantidad de Entradas:</label>
+            <input type="number" id="cantidad" name="cantidad" required max="<?php echo $disponibles; ?>">
             <label for="email">Correo Electrónico:</label>
             <input type="email" id="email" name="email" required>
-
-            <button type="submit" name="accion" value="crear">Comprar</button>
+            <button type="submit" name="accion" value="crear">Comprar Entradas</button>
         </form>
-    </section>
-    <hr>
 
-    <!-- Listado de entradas -->
-    <section id="listado-entradas">
-        <h2>Listado de Compras</h2>
-        <?php
-            // Leer entradas
-            $stmt = $conn->prepare("SELECT * FROM entradas");
-            $stmt->execute();
-            $entradas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        <hr>
 
-            foreach ($entradas as $entrada) {
-                echo "ID: " . $entrada['id'] . " - Cantidad: " . $entrada['cantidad'];
-                echo "
-                    <form method='POST' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$entrada['id']}'>
-                        <input type='number' name='cantidad' value='{$entrada['cantidad']}' required>
-                        <button type='submit' name='accion' value='actualizar'>Actualizar</button>
-                        <button type='submit' name='accion' value='eliminar'>Eliminar</button>
-                    </form>
-                    <br>";
-            }
-        ?>
-    </section>
-    <hr>
+        <!-- Listado de compras -->
+        <h3>Listado de Compras</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cantidad</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($entradas as $entrada): ?>
+                    <tr>
+                        <td><?php echo $entrada['id']; ?></td>
+                        <td><?php echo $entrada['cantidad']; ?></td>
+                        <td><?php echo $entrada['email']; ?></td>
+                        <td>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<?php echo $entrada['id']; ?>">
+                                <input type="number" name="cantidad" value="<?php echo $entrada['cantidad']; ?>" required>
+                                <button type="submit" name="accion" value="actualizar">Actualizar</button>
+                            </form>
+                            <form method="POST" style="display:inline;">
+                                <input type="hidden" name="id" value="<?php echo $entrada['id']; ?>">
+                                <button type="submit" name="accion" value="eliminar">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
 
     <footer>
-        <p>Todos los derechos están reservados para Alderete Exequiel 2024</p>
+        <p> © Todos los derechos reservados para Alderete Exequiel - 2024</p>
     </footer>
-
-    <?php if (!empty($mensaje)) : ?>
-        <script>
-            alert("<?php echo $mensaje; ?>");
-        </script>
-    <?php endif; ?>
 </body>
 </html>

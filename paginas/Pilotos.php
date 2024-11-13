@@ -10,73 +10,14 @@
 
 <body>
     <?php
-        include '../php/conexion.php';
+    include '../php/conexion.php'; 
 
-        // Datos de pilotos (esto se puede guardar en la base de datos para hacerlo dinámico en el futuro)
-        $pilotos = [
-            "lewis_hamilton" => [
-                "nombre" => "Lewis Hamilton",
-                "descripcion" => "Lewis Hamilton es siete veces campeón del mundo y uno de los mejores pilotos de la historia.",
-                "imagen" => "../Imagenes/hamilton.jpeg"
-            ],
-            "george_russell" => [
-                "nombre" => "George Russell",
-                "descripcion" => "George Russell es un joven talento de Mercedes con gran futuro en la F1.",
-                "imagen" => "../Imagenes/russell.jpeg"
-            ],
-            "max_verstappen" => [
-                "nombre" => "Max Verstappen",
-                "descripcion" => "Max Verstappen es el actual campeón de la Fórmula 1 y uno de los pilotos más agresivos.",
-                "imagen" => "../Imagenes/verstappen.jpeg"
-            ],
-            "sergio_perez" => [
-                "nombre" => "Sergio Pérez",
-                "descripcion" => "Sergio 'Checo' Pérez es el piloto mexicano de Red Bull con múltiples victorias en su haber.",
-                "imagen" => "../Imagenes/perez.jpeg"
-            ],
-            "charles_leclerc" => [
-                "nombre" => "Charles Leclerc",
-                "descripcion" => "Charles Leclerc es el piloto monegasco estrella de Ferrari, conocido por su velocidad y destreza.",
-                "imagen" => "../Imagenes/leclerc.jpeg"
-            ],
-            "carlos_sainz" => [
-                "nombre" => "Carlos Sainz",
-                "descripcion" => "Carlos Sainz es un piloto español de Ferrari, hijo del famoso piloto de rally Carlos Sainz Sr.",
-                "imagen" => "../Imagenes/sainz.jpeg"
-            ],
-            "lando_norris" => [
-                "nombre" => "Lando Norris",
-                "descripcion" => "Lando Norris es el joven piloto británico de McLaren, conocido por su talento y carisma.",
-                "imagen" => "../Imagenes/norris.jpeg"
-            ],
-            "oscar_piastri" => [
-                "nombre" => "Oscar Piastri",
-                "descripcion" => "Oscar Piastri es un prometedor piloto australiano de McLaren.",
-                "imagen" => "../Imagenes/piastri.jpeg"
-            ],
-            "esteban_ocon" => [
-                "nombre" => "Esteban Ocon",
-                "descripcion" => "Esteban Ocon es el piloto francés de Alpine, ganador del Gran Premio de Hungría 2021.",
-                "imagen" => "../Imagenes/ocon.jpeg"
-            ],
-            "pierre_gasly" => [
-                "nombre" => "Pierre Gasly",
-                "descripcion" => "Pierre Gasly, piloto francés de Alpine, es conocido por su victoria en Monza 2020.",
-                "imagen" => "../Imagenes/gasly.jpeg"
-            ],
-            "alex_albon" => [
-                "nombre" => "Alex Albon",
-                "descripcion" => "Alex Albon es el piloto tailandés-británico de Williams, con experiencia en Red Bull.",
-                "imagen" => "../Imagenes/albon.jpeg"
-            ],
-            "franco_colapinto" => [
-                "nombre" => "Franco Colapinto",
-                "descripcion" => "Franco Colapinto es un piloto argentino que compite en la academia de Williams.",
-                "imagen" => "../Imagenes/colapinto.jpeg"
-            ]
-        ];
+    // Obtener todos los pilotos de la base de datos
+    $stmt = $conn->prepare("SELECT * FROM pilotos");
+    $stmt->execute();
+    $pilotos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     ?>
-
+    
     <header>
         <a href="../index.php"><img src="../Imagenes/F1.jpeg" alt="Logo de la F1" width="200" height="150"></a>
         <br><br>
@@ -94,8 +35,9 @@
         <h2>Seleccione el piloto de F1 que desea ver:</h2>
         <select name="piloto" id="piloto">
             <?php
-            foreach ($pilotos as $clave => $info) {
-                echo "<option value='$clave'>{$info['nombre']}</option>";
+            // Mostrar los pilotos en el select
+            foreach ($pilotos as $piloto) {
+                echo "<option value='{$piloto['id']}'>{$piloto['nombre']}</option>";
             }
             ?>
         </select>
@@ -107,7 +49,7 @@
         <p>Descripción del piloto:</p>
         <p id="descripcionPiloto"></p>
         <div id="pilotoImagen">
-            <img src="../Imagenes/todos.jpeg" alt="Foto de los pilotos" id="imgPilotos">
+            <img src="../Imagenes/todos.jpeg" alt="Foto de los pilotos" id="imgPilotos" width="300" height="200">
         </div>
     </div>
 
@@ -120,9 +62,14 @@
         const dataPilotos = <?php echo json_encode($pilotos); ?>;
 
         function mostrarPiloto() {
-            const piloto = document.getElementById("piloto").value;
-            const descripcion = dataPilotos[piloto].descripcion;
-            const imagen = dataPilotos[piloto].imagen;
+            // Obtiene el ID del piloto seleccionado
+            const pilotoId = document.getElementById("piloto").value;
+            // Encuentra el piloto correspondiente en el arreglo de datos
+            const piloto = dataPilotos.find(p => p.id == pilotoId);
+
+            // Si el piloto existe, muestra su descripción e imagen; si no, muestra mensaje e imagen predeterminada
+            const descripcion = piloto ? piloto.descripcion : 'No se encontró descripción';
+            const imagen = piloto ? piloto.imagen : '../Imagenes/todos.jpeg'; // Imagen predeterminada si no se encuentra
 
             document.getElementById("descripcionPiloto").innerText = descripcion;
             document.getElementById("imgPilotos").src = imagen;
