@@ -83,21 +83,6 @@ VALUES
 (10, 7, 200), -- Pierre Gasly, Alpine, 200 puntos
 (11, 7, 190); -- Esteban Ocon, Alpine, 190 puntos
 
-
-CREATE TABLE correos (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    entrada_id INT,
-    email VARCHAR(255) NOT NULL,
-    FOREIGN KEY (entrada_id) REFERENCES entradas(id) ON DELETE CASCADE
-);
-
-CREATE TABLE usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario VARCHAR(50) NOT NULL UNIQUE,
-    contraseña VARCHAR(255) NOT NULL,
-    rol ENUM('admin', 'usuario') DEFAULT 'usuario'
-);
-
 CREATE TABLE administradores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
